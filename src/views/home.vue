@@ -131,7 +131,7 @@ const handleResetGame = () => {
               :src="`src/assets/image/1/${item.imageName}.SVG`"
               v-if="item.showImage || item.found"
             />
-            <p v-else>{{ item.imageName }}</p>
+            <p v-else>{{ index + 1 }}</p>
           </transition-fade>
         </div>
       </div>
@@ -147,7 +147,7 @@ const handleResetGame = () => {
             <img src="@/assets/image/start.svg" />
           </button>
         </transition-fade>
-
+        
         <div @click="state.soundStatus = !state.soundStatus" class="sound">
           <img
             :src="`src/assets/image/${
