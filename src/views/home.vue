@@ -42,21 +42,21 @@ const handleShuffleAndDuplicate = () => {
 
 const handleShowImage = (item) => {
   if (!state.startGame) (state.startGame = true), handleTimer();
-  if (!item.showImage) state.numberOfMoves--;
-  item.showImage = !item.showImage;
 
   const filterList = state.list.filter(
     (filter) => filter.showImage && !filter.found
   );
-
-  if (filterList.length === 2) {
-    if (filterList[0].imageName === filterList[1].imageName) {
+  if (filterList.length > 1) return;
+  if (!item.showImage) state.numberOfMoves--;
+  item.showImage = true;
+  if (filterList.length === 1) {
+    if (filterList[0].imageName === item.imageName) {
       filterList[0].found = true;
-      filterList[1].found = true;
+      item.found = true;
     } else {
       setTimeout(() => {
-        state.list.forEach((changeShowImage) => {
-          changeShowImage.showImage = false;
+        state.list.forEach((changeStatus) => {
+          changeStatus.showImage = false;
         });
       }, 2000);
     }
