@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, reactive } from "vue";
+import { computed, onMounted, reactive } from "vue";
 /////////////////////////
-let sound = new Audio("/assets/alarm.wav");
+let sound = new Audio("/assets/sound.mp3");
 const state = reactive({
   list: [],
   soundStatus: true,
@@ -11,6 +11,19 @@ const state = reactive({
 });
 
 onMounted(() => handleShuffleAndDuplicate());
+
+const gameStatus = computed(() => {
+  const itsAllRight = state.list.every((item) => item.found);
+  const click = state.numberOfMoves === 0;
+  const timer = state.timer.minute === 0 && state.timer.second === 0;
+  if (itsAllRight) {
+    return "win";
+  } else if (click || timer) {
+    return "lose";
+  } else {
+    return "isPlaying";
+  }
+});
 
 const handleShuffleAndDuplicate = () => {
   const array = [
@@ -53,6 +66,7 @@ const handleShowImage = (item) => {
     if (filterList[0].imageName === item.imageName) {
       filterList[0].found = true;
       item.found = true;
+      if (state.soundStatus) sound.play();
     } else {
       setTimeout(() => {
         state.list.forEach((changeStatus) => {
@@ -77,6 +91,14 @@ const handleTimer = () => {
     }
   }, 1000);
 };
+
+const handleResetGame = () => {
+  state.startGame = false;
+  state.numberOfMoves = 40;
+  clearInterval(state.timer.setInterval);
+  state.timer = { minute: 2, second: 0, setInterval: 0 };
+  handleShuffleAndDuplicate();
+};
 </script>
 <template>
   <div class="parent-game">
@@ -92,7 +114,7 @@ const handleTimer = () => {
         </div>
       </div>
 
-      <div class="main">
+      <div v-if="gameStatus === 'isPlaying'" class="main">
         <div
           :class="
             item.showImage || item.found
@@ -109,16 +131,22 @@ const handleTimer = () => {
               :src="`src/assets/image/1/${item.imageName}.SVG`"
               v-if="item.showImage || item.found"
             />
-            <p v-else>{{ index + 1 }}</p>
+            <p v-else>{{ item.imageName }}</p>
           </transition-fade>
         </div>
       </div>
 
-      <div class="footer">
-        <button class="btn-start">
-          <p>شروع</p>
-          <img src="@/assets/image/start.svg" />
-        </button>
+      <div v-if="gameStatus === 'isPlaying'" class="footer">
+        <transition-fade>
+          <button
+            @click="handleResetGame"
+            v-if="state.startGame"
+            class="btn-start"
+          >
+            <p>شروع مجدد</p>
+            <img src="@/assets/image/start.svg" />
+          </button>
+        </transition-fade>
 
         <div @click="state.soundStatus = !state.soundStatus" class="sound">
           <img
@@ -129,6 +157,31 @@ const handleTimer = () => {
           <p>{{ state.soundStatus ? "فعال" : "غیر فعال" }}</p>
         </div>
       </div>
+
+      <div class="game-status" v-else-if="gameStatus === 'win'">
+        <p>تبریک میگم شما برنده شدید</p>
+        <button
+          @click="handleResetGame"
+          v-if="state.startGame"
+          class="btn-start"
+        >
+          <p>شروع مجدد</p>
+          <img src="@/assets/image/start.svg" />
+        </button>
+      </div>
+
+      <div class="game-status" v-else>
+        <p>برنده نشدید :(</p>
+        <button
+          @click="handleResetGame"
+          v-if="state.startGame"
+          class="btn-start"
+        >
+          <p>شروع مجدد</p>
+          <img src="@/assets/image/start.svg" />
+        </button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -137,7 +190,7 @@ const handleTimer = () => {
   @apply w-screen h-screen flex justify-start md:justify-center overflow-x-auto items-center;
 }
 .parent-content {
-  @apply flex flex-col justify-center items-center bg-white p-[60px] gap-y-[30px];
+  @apply flex flex-col justify-center items-center bg-white p-[60px] gap-y-[35px];
   min-width: 600px;
   width: 600px;
 }
@@ -167,7 +220,7 @@ const handleTimer = () => {
   transform: rotateX(180deg);
 }
 .footer {
-  @apply w-full flex items-center justify-between;
+  @apply w-full flex items-center justify-evenly;
 }
 .btn-start {
   @apply flex gap-x-[10px] items-center px-[40px] py-[10px] rounded-[10px] transition-all bg-[#32BB71] hover:bg-[#47a374];
@@ -180,5 +233,11 @@ const handleTimer = () => {
 }
 .sound p {
   @apply text-[18px] font-bold;
+}
+.game-status {
+  @apply flex flex-col gap-[10px] items-center justify-center;
+}
+.game-status p {
+  @apply font-bold text-[18px];
 }
 </style>
