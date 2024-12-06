@@ -128,7 +128,7 @@ const handleResetGame = () => {
         >
           <transition-fade :delay="100" group>
             <img
-              :src="`src/assets/image/1/${item.imageName}.SVG`"
+              :src="`/assets/${item.imageName}.SVG`"
               v-if="item.showImage || item.found"
             />
             <p v-else>{{ index + 1 }}</p>
@@ -144,13 +144,13 @@ const handleResetGame = () => {
             class="btn-start"
           >
             <p>شروع مجدد</p>
-            <img src="@/assets/image/start.svg" />
+            <img src="/assets/start.svg" />
           </button>
         </transition-fade>
         
         <div @click="state.soundStatus = !state.soundStatus" class="sound">
           <img
-            :src="`src/assets/image/${
+            :src="`/assets/${
               state.soundStatus ? 'sound-active' : 'sound-disable'
             }.svg`"
           />
@@ -166,7 +166,7 @@ const handleResetGame = () => {
           class="btn-start"
         >
           <p>شروع مجدد</p>
-          <img src="@/assets/image/start.svg" />
+          <img src="/assets/start.svg" />
         </button>
       </div>
 
@@ -178,7 +178,7 @@ const handleResetGame = () => {
           class="btn-start"
         >
           <p>شروع مجدد</p>
-          <img src="@/assets/image/start.svg" />
+          <img src="/assets/start.svg" />
         </button>
       </div>
 
